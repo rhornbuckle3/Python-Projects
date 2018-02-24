@@ -32,7 +32,7 @@ def clusterONE(kInput):
     kOneIndex=np.asscalar(kOneIndex[0])
     #now we repeat for the next k-1 points
     #remove the bottom (kNum-1)N/kInput of the difference sort for each new point to avoid finding the same cluster
-    #return kOneIndex
+    #need to make the following 20 lines of code scalable, shouldn't be too hard
     norman=np.array(np.zeros((sampData.shape[0],sampData.shape[1]-1)))
     for i in range(0,kOneIndex):
         norman[:,i]=sampData[:,kOneIndex]-sampData[:,i]
@@ -63,9 +63,8 @@ def clusterAssign(kInput):
         for j in range(0,kIndex.shape[0]):
             diffArray[j]=np.linalg.norm(sampData[:,i]-sampData[:,kIndex[j]],2)
         labels[i]=np.argmin(diffArray)
-        #print(labels[i])
     return labels
-    break
+    
     #After this, things get kinda stupid. A bad first attempt
     threshold=True
     clusterCenters=np.array(np.zeros((sampData.shape[0],kIndex.shape[0])))
@@ -91,7 +90,6 @@ def clusterAssign(kInput):
         for i in range(0,sampData.shape[1]):
             for j in range(0,kIndex.shape[0]):
                 diffArray[j]=np.linalg.norm(sampData[:,i]-kIndexLocat[:,j],2)
-            #if(np.argmin(f)
             labels[i]=np.argmin(diffArray)
             print(labels[i])
 
@@ -117,5 +115,5 @@ def error(labels):
 #print(clusterAssign(2))
 #clusterAssign(2)
 print(error(clusterAssign(2)))
-#implement logistic regression classifier for extra credit
+#implement iterative 'aggressive' logistic regression classifier for extra credit
 
