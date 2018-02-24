@@ -3,7 +3,7 @@ import pandas as pd
 import math as mt
 import numpy.random 
 import matplotlib.pyplot as plt
-sampData=pd.read_csv("K_Meand_Data.csv")
+sampData=pd.read_csv("K_Means_Data.csv")
 sampData=sampData.T
 sampData=sampData.values
 def clusterONE(kInput):
