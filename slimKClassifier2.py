@@ -29,7 +29,6 @@ def clusterONE(kInput):
         normAvg[i]=np.sum(normsFin[i:i+mt.floor(sampData.shape[1]/(kInput+1))])
     kOne=np.argmin(normAvg)
     kOneIndex=np.where(normanNorms==normSort[normSort.shape[0]-1,1+kOne+mt.floor(mt.floor(sampData.shape[1]/(kInput+1))/2)])
-    #kOneIndex=np.where(norman==normSort[1+kOne+mt.floor(mt.floor(sampData.shape[1]/(kInput+1))/2)])
     kOneIndex=np.asscalar(kOneIndex[0])
     #now we repeat for the next k-1 points
     #remove the bottom (kNum-1)N/kInput of the difference sort for each new point to avoid finding the same cluster
@@ -65,6 +64,9 @@ def clusterAssign(kInput):
             diffArray[j]=np.linalg.norm(sampData[:,i]-sampData[:,kIndex[j]],2)
         labels[i]=np.argmin(diffArray)
         #print(labels[i])
+    return labels
+    break
+    #After this, things get kinda stupid. A bad first attempt
     threshold=True
     clusterCenters=np.array(np.zeros((sampData.shape[0],kIndex.shape[0])))
     modData=np.array(sampData)
@@ -74,7 +76,6 @@ def clusterAssign(kInput):
         #calculating new center off of average of label owners
         for j in range(0,kIndex.shape[0]):
             avgCalcVec=None
-            #print(labels.shape)
             for i in range(0,labels.shape[0]):
                 if(labels[i]==j):
                     if(type(avgCalcVec)=='numpy.ndarray'):
@@ -103,9 +104,18 @@ def clusterAssign(kInput):
     #print(labels)
     #print(kIndex)
     return labels
+def error(labels):
+    truthData=pd.read_csv("K_Means_Truth.csv")
+    truthData=truthData.T
+    truthData=truthData.values
+    iterate=0
+    for i in range(0,truthData.shape[1]):
+        if(labels[i]!=truthData[0,i]):
+            iterate=iterate+1
+    return (iterate/truthData.shape[1])*100
 #print(clusterONE(2))
 #print(clusterAssign(2))
-clusterAssign(2)
-#implement second K point selector (avoids looking at closest n/(k+1) samples to first K point) also described on line 35
-#implement logistic regression for classifier
-#implement lloyd's algorithm classifier
+#clusterAssign(2)
+print(error(clusterAssign(2)))
+#implement logistic regression classifier for extra credit
+
