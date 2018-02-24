@@ -151,4 +151,3 @@ centerOne,centerTwo=clusterONE(2)
 print(error(simpleClass(2,centerOne,centerTwo)))
 #print(error(lloydsCenterSpec(centerOne,centerTwo)))
 #implement iterative 'aggressive' logistic regression classifier for extra credit
-#example
