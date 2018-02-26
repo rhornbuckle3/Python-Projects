@@ -126,8 +126,8 @@ def lloydsCenterSpec(kPointOne,kPointTwo):
         kThresher=np.array(kIndexLocat)
         if(checker==sampData.shape[0]):
             return labels
-def error(labels):
-    truthData=pd.read_csv("K_Means_Truth.csv")
+def error(labels,truthFile):
+    truthData=pd.read_csv(truthFile)
     truthData=truthData.T
     truthData=truthData.values
     iterate=0
@@ -170,13 +170,13 @@ def simpleClass(centerOne,centerTwo):
         labels[i]=np.argmin(diffArray)
     return labels
 centerOne,centerTwo=clusterONE(2)
-print(error(simpleClass(centerOne,centerTwo)))
+print(error(simpleClass(centerOne,centerTwo),"K_Means_Truth.csv"))
 #with my algorithm for determining cluster centers and then assigning every sample to its closest center
 #centerOne,centerTwo=trueCenterLoad()
-#print(error(lloydsCenterSpec(centerOne,centerTwo)))
+#print(error(lloydsCenterSpec(centerOne,centerTwo),"K_Means_Truth.csv"))
 #^with the true centers
 #centerOne,centerTwo=randomCenters(2)
-#print(error(clusterAssignLloyd(centerOne,centerTwo)))
+#print(error(clusterAssignLloyd(centerOne,centerTwo),"K_Means_Truth.csv"))
 #^with random cluster centers
 #implement iterative 'aggressive' logistic regression classifier for extra credit
 #example
