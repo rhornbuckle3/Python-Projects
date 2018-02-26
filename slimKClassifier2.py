@@ -51,7 +51,7 @@ def clusterONE(kInput):
     kTwoIndex=np.where(normanNorms==normSort[normSort.shape[0]-1,1+kOne+mt.floor(mt.floor(sampData.shape[1]/(kInput+1))/2)])
     kTwoIndex=np.asscalar(kTwoIndex[0])
     return kOneIndex,kTwoIndex
-def clusterAssignLloyd(kInput,centerOne,centerTwo):
+def clusterAssignLloyd(centerOne,centerTwo):
     kIndex=np.array((centerOne,centerTwo))
     labels=np.array(np.zeros(sampData.shape[1]))
     diffArray=np.copy(np.zeros(kIndex.shape[0]))
@@ -59,10 +59,9 @@ def clusterAssignLloyd(kInput,centerOne,centerTwo):
         for j in range(0,kIndex.shape[0]):
             diffArray[j]=np.linalg.norm(sampData[:,i]-sampData[:,kIndex[j]],2)
         labels[i]=np.argmin(diffArray)
-    threshold=True
     modData=np.array(sampData)
-    while(threshold):
-        labelsOG=np.copy(labels)
+    kThresher=np.array(np.zeros((modData.shape[0],kIndex.shape[0])))
+    while(True):
         kIndexLocat=np.array(np.zeros((modData.shape[0],kIndex.shape[0])))
         #calculating new center off of average of label owners
         avgCalcVec=np.array(modData[:,0])
@@ -81,7 +80,12 @@ def clusterAssignLloyd(kInput,centerOne,centerTwo):
             for j in range(0,kIndex.shape[0]):
                 diffArray[j]=np.linalg.norm(sampData[:,i]-kIndexLocat[:,j],2)
             labels[i]=np.argmin(diffArray)
-        if(np.all(labels==labelsOG)):
+        checker=0
+        for i in range(0,modData.shape[0]):
+            if((abs(kThresher[i,0]-kIndexLocat[i,0])<10e-4)&(abs(kThresher[i,1]-kIndexLocat[i,1])<10e-4)):
+                checker=checker+1
+        kThresher=np.array(kIndexLocat)
+        if(checker==sampData.shape[0]):
             return labels
 def lloydsCenterSpec(kPointOne,kPointTwo):
     modData=np.array(sampData)
@@ -95,9 +99,8 @@ def lloydsCenterSpec(kPointOne,kPointTwo):
             for j in range(0,kIndex.shape[0]):
                 diffArray[j]=np.linalg.norm(sampData[:,i]-kPointOne[:,j],2)
             labels[i]=np.argmin(diffArray)
-    threshold=True
-    while(threshold):
-        labelsOG=np.copy(labels)
+    kThresher=np.array(np.zeros((modData.shape[0],kIndex.shape[0])))
+    while(True):
         kIndexLocat=np.array(np.zeros((modData.shape[0],kIndex.shape[0])))
         #calculating new center off of average of label owners
         avgCalcVec=np.array(modData[:,0])
@@ -116,13 +119,24 @@ def lloydsCenterSpec(kPointOne,kPointTwo):
             for j in range(0,kIndex.shape[0]):
                 diffArray[j]=np.linalg.norm(sampData[:,i]-kIndexLocat[:,j],2)
             labels[i]=np.argmin(diffArray)
-        if(np.all(labels==labelsOG)):
+        checker=0
+        for i in range(0,modData.shape[0]):
+            if((abs(kThresher[i,0]-kIndexLocat[i,0])<10e-4)&(abs(kThresher[i,1]-kIndexLocat[i,1])<10e-4)):
+                checker=checker+1
+        kThresher=np.array(kIndexLocat)
+        if(checker==sampData.shape[0]):
             return labels
 def error(labels):
     truthData=pd.read_csv("K_Means_Truth.csv")
     truthData=truthData.T
     truthData=truthData.values
     iterate=0
+    for i in range(0,labels.shape[0]):
+        if(labels[i]==0):
+            labels[i]=1
+        else:
+             if(labels[i]==1):
+                labels[i]=0
     for i in range(0,truthData.shape[1]):
         if(labels[i]!=truthData[0,i]):
             iterate=iterate+1
@@ -137,7 +151,7 @@ def trueCenterLoad():
     trueKcen=trueKcen['mu_init']
     trueKcen=np.array(trueKcen)
     return trueKcen[:,0],trueKcen[:,1]
-def simpleClass(kInput,centerOne,centerTwo):
+def simpleClass(centerOne,centerTwo):
     kIndex=np.array((centerOne,centerTwo))
     labels=np.array(np.zeros(sampData.shape[1]))
     diffArray=np.copy(np.zeros(kIndex.shape[0]))
@@ -146,9 +160,14 @@ def simpleClass(kInput,centerOne,centerTwo):
             diffArray[j]=np.linalg.norm(sampData[:,i]-sampData[:,kIndex[j]],2)
         labels[i]=np.argmin(diffArray)
     return labels
-
-centerOne,centerTwo=clusterONE(2)
-print(error(simpleClass(2,centerOne,centerTwo)))
+#centerOne,centerTwo=clusterONE(2)
+#print(error(simpleClass(centerOne,centerTwo)))
+#with my algorithm for determining cluster centers and then assigning every sample to its closest center
+#centerOne,centerTwo=trueCenterLoad()
 #print(error(lloydsCenterSpec(centerOne,centerTwo)))
+#^with the true centers
+#centerOne,centerTwo=randomCenters(2)
+#print(error(clusterAssignLloyd(centerOne,centerTwo)))
+#^with random cluster centers
 #implement iterative 'aggressive' logistic regression classifier for extra credit
 #example
