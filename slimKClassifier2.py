@@ -131,6 +131,11 @@ def error(labels):
     truthData=truthData.T
     truthData=truthData.values
     iterate=0
+    for i in range(0,truthData.shape[1]):
+        if(labels[i]!=truthData[0,i]):
+            iterate=iterate+1
+    errorONE=(iterate/truthData.shape[1])*100
+    iterate=0
     for i in range(0,labels.shape[0]):
         if(labels[i]==0):
             labels[i]=1
@@ -140,7 +145,11 @@ def error(labels):
     for i in range(0,truthData.shape[1]):
         if(labels[i]!=truthData[0,i]):
             iterate=iterate+1
-    return (iterate/truthData.shape[1])*100
+    errorTwo=(iterate/truthData.shape[1])*100
+    if(errorONE>errorTwo):
+         return errorTwo
+    else:
+        return errorOne
 def randomCenters(kInput):
     #not scalable yet
     ranCenOne=random.choice(range(0,sampData.shape[1]))
@@ -160,8 +169,8 @@ def simpleClass(centerOne,centerTwo):
             diffArray[j]=np.linalg.norm(sampData[:,i]-sampData[:,kIndex[j]],2)
         labels[i]=np.argmin(diffArray)
     return labels
-#centerOne,centerTwo=clusterONE(2)
-#print(error(simpleClass(centerOne,centerTwo)))
+centerOne,centerTwo=clusterONE(2)
+print(error(simpleClass(centerOne,centerTwo)))
 #with my algorithm for determining cluster centers and then assigning every sample to its closest center
 #centerOne,centerTwo=trueCenterLoad()
 #print(error(lloydsCenterSpec(centerOne,centerTwo)))
