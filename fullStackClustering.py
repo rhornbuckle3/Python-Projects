@@ -192,18 +192,40 @@ def logModelSlow():
             for i in range(0,clusterTwo.shape[0]):
                 labels[clusterTwo[i]]=1
             return labels
-def eucliDistClass():
+def eucliDistModel():
     clusterCenter,clusterOne,clusterTwo,kDiff=safeLabels()
-    setSize=sampData.shape[1]-clusterOne.shape[0]-clusterTwo.shape[0]
-    euclidOne=np.array(np.zeros((clusterOne.shape[0],sampData.shape[1]-clusterOne.shape[0]-clusterTwo.shape[0])))
-    euclidTwo=np.array(np.zeros((clusterTwo.shape[0],sampData.shape[1]-clusterOne.shape[0]-clusterTwo.shape[0])))
-    for i in range(0,setSize):
-        for j in range(0,clusterOne.shape[0]):
-            euclidOne[j,i]=np.linalg.norm(sampData[:,i]-sampData[:,clusterOne[j]],2)
-        for j in range(0,clusterTwo.shape[0]):
-            euclidTwo[j,i]=np.linalg.norm(sampData[:,i]-sampData[:,clusterTwo[j]],2)
+    error=0
     while(True):
-        setSize=sampData.shape[1]-clusterOne.shape[0]-clusterTwo.shape[0]
+        indSav=[]
+        setSize=sampData.shape[1]-(clusterOne.shape[0]+clusterTwo.shape[0])
+        euclidOne=np.array(np.zeros((clusterOne.shape[0],setSize)))
+        euclidTwo=np.array(np.zeros((clusterTwo.shape[0],setSize)))
+        euCoun=0
+        print(clusterOne.shape[0])
+        print(clusterTwo.shape[0])
+        print(setSize)
+        print("LLLLLLLLLLLLLLLLLLLLL")
+        for i in range(0,sampData.shape[1]):
+            if(((clusterOne!=i).all())and((clusterTwo!=i).all())):
+            #if((oneCheck)and(twoCheck)):
+                if(euCoun==setSize):
+                    error=error+1
+                    print("euError")
+                    print(error)
+                    pass
+                else:
+                    #print(euclidOne.shape[1])
+                    #print(euclidTwo.shape[1])
+                    #print(euCoun)
+                    #print(i)
+                    for j in range(0,clusterOne.shape[0]):
+                        euclidOne[j,euCoun]=np.linalg.norm(sampData[:,i]-sampData[:,clusterOne[j]],2)
+                    for k in range(0,clusterTwo.shape[0]):
+                        euclidTwo[k,euCoun]=np.linalg.norm(sampData[:,i]-sampData[:,clusterTwo[k]],2)
+                    if(not((i in indSav))):
+                        indSav.append(i)
+                    euCoun=euCoun+1
+        indSav=np.array(indSav)
         if(clusterOne.shape[0]+clusterTwo.shape[0]==sampData.shape[1]):
             #create and return labels vector here that matches original positions
             labels=np.array(np.zeros(sampData.shape[1]))
@@ -213,31 +235,41 @@ def eucliDistClass():
                 labels[clusterTwo[i]]=1
             return labels
         if(clusterOne.shape[0]-clusterTwo.shape[0]>0):
-            kMin=mt.floor(clusterTwo.shape[0]/2)
+            kMin=mt.floor(clusterTwo.shape[0]/10)
         else:
-            kMin=mt.floor(clusterOne.shape[0]/2)
+            kMin=mt.floor(clusterOne.shape[0]/10)
         normMinOne=np.array(np.zeros(setSize))
         normMinTwo=np.array(np.zeros(setSize))
-        for i in range(0,setSize):
+        #print(euclidOne.shape)
+        #print(normMinOne.shape)
+        #print(normMinTwo.shape)
+        #print(euclidTwo.shape)
+        #print(setSize)
+        #print(kMin)
+        for i in range(0,euclidOne.shape[1]):
             normMinOne[i]=np.sum(euclidOne[range(0,kMin),i])
+        for i in range(0,euclidTwo.shape[1]):
             normMinTwo[i]=np.sum(euclidTwo[range(0,kMin),i])
-        winOne=np.array(sampData.shape[0])
-        winTwo=np.array(sampData.shape[0])
+        winOne=[]
+        winTwo=[]
         for i in range(0,setSize):
             #store indices of 'i' into two arrays indicating which set a sample favors, this makes the next bit easier
             if(normMinOne[i]>normMinTwo[i]):
-                winOne=np.append(winOne,i)
+                winOne.append(i)
             if(normMinOne[i]<normMinTwo[i]):
-                winTwo=np.append(winTwo,i)
-        #something is horridly wrong here, need to retrieve original indices for adding to clusters
-        if(winOne.shape[0]>1):
-            clusterOne=np.append(clusterOne,np.argmin(normMinOne[winOne[1:]]))
-            euclidOne=np.delete(euclidOne,euclidOne[:,np.argmin(normMinOne[winOne[1:]])])
-            euclidTwo=np.delete(euclidTwo,euclidTwo[:,np.argmin(normMinOne[winOne[1:]])])
-        if(winTwo.shape[0]>1):
-            clusterTwo=np.append(clusterTwo,np.argmin(normMinTwo[winTwo[1:]]))
-            euclidOne=np.delete(euclidOne,euclidOne[:,np.argmin(normMinTwo[winTwo[1:]])])
-            euclidTwo=np.delete(euclidTwo,euclidTwo[:,np.argmin(normMinTwo[winTwo[1:]])])
+                winTwo.append(i)
+        winOne=np.array(winOne)
+        winTwo=np.array(winTwo)
+        if(winOne.shape[0]>0):
+            #print(np.argmin(normMinOne[winOne[1:]]))
+            clusterOne=np.append(clusterOne,indSav[np.argmin(normMinOne[winOne])])
+            #euclidOne=np.delete(euclidOne,np.argmin(normMinOne[winOne[1:]]),axis=1)
+            #euclidTwo=np.delete(euclidTwo,np.argmin(normMinOne[winOne[1:]]),axis=1)
+        if(winTwo.shape[0]>0):
+            #print(np.argmin(normMinTwo[winTwo[1:]]))
+            clusterTwo=np.append(clusterTwo,indSav[np.argmin(normMinTwo[winTwo])])
+            #euclidOne=np.delete(euclidOne,np.argmin(normMinTwo[winTwo[1:]]),axis=1)
+            #euclidTwo=np.delete(euclidTwo,np.argmin(normMinTwo[winTwo[1:]]),axis=1)
         
 def error(labels,truthFile):
     truthData=pd.read_csv(truthFile)
@@ -264,4 +296,4 @@ def error(labels,truthFile):
     else:
         return errorOne, iterate
 loadData("K_Means_Data.csv")
-print(error(eucliDistClass(),"K_Means_Truth.csv"))
+print(error(eucliDistModel(),"K_Means_Truth.csv"))
