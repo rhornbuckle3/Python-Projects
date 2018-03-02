@@ -72,7 +72,7 @@ def clusterAssignLloyd(centerOne,centerTwo):
                 if(labels[i]==kKeeper):
                     avgCalcVec=np.append(avgCalcVec,modData[:,i].reshape((-1,1)),axis=1)
             for l in range(0,modData.shape[0]):
-                        kIndexLocat[l,j]=np.sum(avgCalcVec[l,:])/avgCalcVec.shape[1]
+                kIndexLocat[l,j]=np.sum(avgCalcVec[l,:])/avgCalcVec.shape[1]
             for i in range(0,labels.shape[0]):
                 if(labels[i]!=kKeeper):
                     kKeeper=np.asscalar(labels[i])
