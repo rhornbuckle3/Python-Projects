@@ -17,12 +17,12 @@ bookEntropy=np.array(np.zeros((len(bookCount))))
 for i in range(0,bookEntropy.size):
     #calculating the actual entropy
     bookEntropy[i]=(bookCount[i]/bookLen)*mt.log2(bookLen/bookCount[i])
+print(bookEntropy.sum())
 fullBookEntropy=bookEntropy.sum()*bookLen
 print(fullBookEntropy)
 #book is done
 #phototime
-imagr=cv2.imread("place_final.jpg")
-imagrARR=np.array(list(imagr))
+imagrARR=np.array(list(cv2.imread("place_final.jpg")))
 #getting the image into an array so that I can work on it
 imgCOLREF=np.array(np.zeros((256,256,256)))
 #I'll fit an array to the 256^3 color index and use that to keep track of the # of occurences of each color. It's a bit brute force-eske
@@ -36,5 +36,6 @@ imgEntropy=np.array(np.zeros(imgCOLFIN.shape))
 for i in range(0,imgEntropy.size):
     #calculating the entropy
     imgEntropy[i]=(imgCOLFIN[i]/imagrARR.size)*mt.log2(imagrARR.size/imgCOLFIN[i])
+print(imgEntropy.sum())
 fullImageEntropy=imgEntropy.sum()*imagrARR.size/3
 print(fullImageEntropy)
